@@ -1,7 +1,8 @@
 const database = require("./database");
 //Quest 6----------------
 const getUsers = (req, res) => {
-  const initialSql = "select id, firstname, lastname, email, city, language from users";
+  const initialSql =
+    "select id, firstname, lastname, email, city, language from users";
   const where = [];
 
   if (req.query.language != null) {
@@ -53,7 +54,10 @@ const getUserById = (req, res) => {
   const id = parseInt(req.params.id);
 
   database
-    .query("select id, firstname, lastname, email, city, language from users where id = ?", [id])
+    .query(
+      "select id, firstname, lastname, email, city, language from users where id = ?",
+      [id]
+    )
     .then(([users]) => {
       if (users[0] != null) {
         res.json(users[0]);
@@ -68,12 +72,13 @@ const getUserById = (req, res) => {
 };
 //firstname,lastname,email,city
 const postUser = (req, res) => {
-  const { firstname, lastname, email, city, language, hashedPassword } = req.body;
+  const { id, firstname, lastname, email, city, language, hashedPassword } =
+    req.body;
 
   database
     .query(
-      "INSERT INTO users(firstname, lastname, email, city, language, hashedPassword) VALUES (?, ?, ?, ?, ?, ?)",
-      [firstname, lastname, email, city, language, hashedPassword]
+      "INSERT INTO users(id, firstname, lastname, email, city, language, hashedPassword) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [id, firstname, lastname, email, city, language, hashedPassword]
     )
     .then(([result]) => {
       // wait for it
@@ -85,28 +90,51 @@ const postUser = (req, res) => {
       res.status(500).send("Error saving the user");
     });
 };
-
-const putUserById = (req, res) => {
-  const id = parseInt(req.params.id);
-  const { firstname, lastname, email, city, language, hashedPassword } = req.body;
+//-----------------Quest 8----------------
+const getUserByEmailWithPasswordAndPassToNext = (req, res, next) => {
+  const { email } = req.body;
 
   database
-    .query(
-      "UPDATE users set firstname = ?, lastname = ?, email = ?, city = ?, language = ?, hashedPassword = ? where id = ?",
-      [firstname, lastname, email, city, language, hashedPassword, id]
-    )
-    .then(([result]) => {
-      // wait for it
-      if (result.affectedRows === 0) {
-        res.status(404).send("Not Found");
+    .query("select * from users where email = ?", [email])
+    .then(([users]) => {
+      if (users[0] != null) {
+        req.user = users[0];
+
+        next();
       } else {
-        res.sendStatus(204);
+        res.sendStatus(401);
       }
     })
     .catch((err) => {
       console.error(err);
-      res.status(500).send("Error saving the user");
+      res.status(500).send("Error retrieving data from database");
     });
+};
+//-----------------Quest 8----------------
+
+const putUserById = (req, res) => {
+  // if (req.params.id === req.payload.sub) {
+    const id = parseInt(req.params.id);
+    const { firstname, lastname, email, city, language, hashedPassword } =
+      req.body;
+
+    database
+      .query(
+        "UPDATE users set firstname = ?, lastname = ?, email = ?, city = ?, language = ?, hashedPassword = ? where id = ?",
+        [firstname, lastname, email, city, language, hashedPassword, id]
+      )
+      .then(([result]) => {
+        // wait for it
+        if (result.affectedRows === 0) {
+          res.status(404).send("Not Found");
+        } else {
+          res.sendStatus(204);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send("Error saving the user");
+      });
 };
 
 const deleteUser = (req, res) => {
@@ -134,4 +162,5 @@ module.exports = {
   postUser,
   putUserById,
   deleteUser,
+  getUserByEmailWithPasswordAndPassToNext,
 };
