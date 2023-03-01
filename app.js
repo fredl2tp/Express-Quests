@@ -21,7 +21,7 @@ const userHandlers = require("./userHandlers");
 const {
   hashPassword,
   verifyPassword,
-  // verifyToken,
+  verifyToken,
   verifyId,
 } = require("./auth.js");
 
@@ -37,15 +37,15 @@ app.post(
   userHandlers.getUserByEmailWithPasswordAndPassToNext,
   verifyPassword
 );
-//Pour la quête 4bis
-// app.use(verifyToken); // authentication wall : verifyToken is activated for each route after this line
+
+app.use(verifyToken); // authentication wall : verifyToken is activated for each route after this line
 //------POST, PUT et DELETE-------
 app.post("/api/movies", validateMovie, movieHandlers.postMovie); //Q4bis
 app.put("/api/movies/:id", validateMovie, movieHandlers.putMovieById);
 app.put(
   "/api/users/:id",
   validateUser,
-  // verifyId, Pour la quête 4bis 
+  verifyId,
   hashPassword,
   userHandlers.putUserById
 );
