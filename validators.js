@@ -3,7 +3,7 @@ const validateMovie = (req, res, next) => {
   const { title, director, year, color, duration } = req.body;
   const errors = [];
 
-  if (!title.length) {
+  if (!title?.length || title == null) {
     errors.push({ field: "title", message: "This field is required" });
   } else if (title.length >= 255) {
     errors.push({
@@ -11,16 +11,16 @@ const validateMovie = (req, res, next) => {
       message: "Should contain less than 255 characters",
     });
   }
-  if (!director.length) {
+  if (!director?.length || director == null) {
     errors.push({ field: "director", message: "This field is required" });
   }
-  if (!year.length) {
+  if (!year?.length || year == null) {
     errors.push({ field: "year", message: "This field is required" });
   }
-  if (!color.length) {
+  if (!color?.length || color == null) {
     errors.push({ field: "color", message: "This field is required" });
   }
-  if (!duration.length) {
+  if (!duration?.length || duration == null) {
     errors.push({ field: "duration", message: "This field is required" });
   }
 
@@ -32,20 +32,20 @@ const validateMovie = (req, res, next) => {
 };
 const validateUser = (req, res, next) => {
   const { firstname, lastname, email, password, city, language } = req.body;
-  console.log(req.body);
   const errors = [];
 
   const emailRegex = /[a-z0-9._]+@[a-z0-9-]+\.[a-z]{2,3}/;
+  const passwordRegex = /^(?=.*?[0-9]).{5,}$/;
 
-  if (!firstname.length) {
+  if (!firstname?.length || firstname == null) {
     errors.push({ field: "firstname", message: "This field is required" });
-  } else if (firstname.length >= 60) {
+  } else if (firstname?.length >= 60) {
     errors.push({
       field: "firstname",
       message: "Should contain less than 60 characters",
     });
   }
-  if (!lastname.length) {
+  if (!lastname?.length || lastname == null) {
     errors.push({ field: "lastname", message: "This field is required" });
   } else if (lastname.length >= 60) {
     errors.push({
@@ -53,7 +53,7 @@ const validateUser = (req, res, next) => {
       message: "Should contain less than 60 characters",
     });
   }
-  if (!email.length) {
+  if (!email?.length || email == null) {
     errors.push({ field: "email", message: "This field is required" });
   } else if (!emailRegex.test(email)) {
     errors.push({ field: "email", message: "Invalid email" });
@@ -63,8 +63,10 @@ const validateUser = (req, res, next) => {
       message: "Should contain less than 255 characters",
     });
   }
-  if (password == null) {
+  if (!password?.length || password == null) {
     errors.push({ field: "password", message: "This field is required" });
+  } else if (!passwordRegex.test(password)) {
+    errors.push({ field: "password", message: "Invalid password" });
   } else if (password.length >= 255) {
     errors.push({
       field: "password",
@@ -72,7 +74,7 @@ const validateUser = (req, res, next) => {
     });
   }
 
-  if (!city.length) {
+  if (!city?.length || city == null) {
     errors.push({ field: "city", message: "This field is required" });
   } else if (city.length >= 60) {
     errors.push({
@@ -80,7 +82,7 @@ const validateUser = (req, res, next) => {
       message: "Should contain less than 60 characters",
     });
   }
-  if (!language.length) {
+  if (!language?.length || language == null) {
     errors.push({ field: "language", message: "This field is required" });
   } else if (language.length >= 60) {
     errors.push({

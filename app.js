@@ -45,7 +45,7 @@ app.put("/api/movies/:id", validateMovie, movieHandlers.putMovieById);
 app.put(
   "/api/users/:id",
   validateUser,
-  verifyId,
+  // verifyId, Pour la quête 4bis 
   hashPassword,
   userHandlers.putUserById
 );
