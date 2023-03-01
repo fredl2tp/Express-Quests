@@ -1,6 +1,8 @@
 require("dotenv").config();
+const path = require("path");
 const express = require("express");
-
+const Session = require('express-session');
+const FileStore = require('session-file-store')(Session);
 const { validateMovie } = require("./validators");
 const { validateUser } = require("./validators");
 
@@ -9,6 +11,18 @@ const app = express();
 app.use(express.json());
 
 const port = process.env.APP_PORT ?? 5000;
+
+app.use(Session({
+  store: new FileStore
+  ({
+      path: path.join(__dirname, '/tmp'),
+      encrypt: true
+  }),
+  secret: 'Super Secret !',
+  resave: true,
+  saveUninitialized: true,
+  name : 'sessionId'
+}));
 
 const welcome = (req, res) => {
   res.send("Welcome to my favourite movie list");
@@ -24,6 +38,14 @@ const {
   verifyToken,
   verifyId,
 } = require("./auth.js");
+
+app.get("/session-in", (req, res) => {
+  req.session.song = "be bop a lula";
+  res.send('coucou');
+});
+app.get("/session-out", (req, res) => {
+  res.send(req.session.song);
+});
 
 //------GET-------
 app.get("/api/movies", movieHandlers.getMovies);
