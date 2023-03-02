@@ -18,16 +18,22 @@ app.use(Session({
       path: path.join(__dirname, '/tmp'),
       encrypt: true
   }),
-  secret: 'Super Secret !',
-  resave: true,
-  saveUninitialized: true,
-  name : 'sessionId'
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  name : process.env.SESSION_NAME,
+  cookie : {
+    
+    maxAge : 1000 * 60 * 60 * 24 * 7,
+    secure : false,
+  }
 }));
 
 const welcome = (req, res) => {
   res.send("Welcome to my favourite movie list");
-};
 
+};
+// console.log(req.session)
 app.get("/", welcome);
 
 const movieHandlers = require("./movieHandlers");

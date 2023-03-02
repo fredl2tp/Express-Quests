@@ -29,13 +29,19 @@ const verifyPassword = (req, res) => {
     .then((isVerified) => {
       if (isVerified) {
         const payload = { sub: req.user.id };
-
+        // Création du token
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
           expiresIn: "4h",
         });
-
+        // Suppression du token
         delete req.user.hashedPassword;
-        res.send({ token, user: req.user });
+        // Nouveau token avec retour du user
+
+        // res.send({ token, user: req.user });
+        res
+          .header("x-auth-token", token)
+          .status(201)
+          .send({ user: [req.user.email, req.user.id] });
       } else {
         res.sendStatus(401);
       }
@@ -49,7 +55,7 @@ const verifyPassword = (req, res) => {
 const verifyToken = (req, res, next) => {
   try {
     const authorizationHeader = req.get("Authorization");
-
+    console.log(authorizationHeader);
     if (authorizationHeader == null) {
       throw new Error("Authorization header is missing");
     }
